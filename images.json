@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "src": "images/photo1.jpg",
+    "category": "nature",
+    "title": "পাহাড়ি দৃশ্য"
+  },
+  {
+    "id": 2,
+    "src": "images/photo2.jpg",
+    "category": "city",
+    "title": "রাতের শহর"
+  },
+  {
+    "id": 3,
+    "src": "images/photo3.jpg",
+    "category": "people",
+    "title": "হাসিমুখ"
+  },
+  {
+    "id": 4,
+    "src": "images/photo4.jpg",
+    "category": "tech",
+    "title": "ল্যাপটপ"
+  }
+]
