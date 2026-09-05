@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>PREMIUM GALLERY · DARK</title>
-  <!-- Font & Icons -->
+  <title>প্রিমিয়াম গ্যালারি</title>
+  <!-- ফন্ট ও আইকন -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&display=swap" rel="stylesheet">
   <style>
+    /* ===== গ্লোবাল স্টাইল ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       background: #0b0d10;
@@ -16,7 +17,7 @@
       overflow-x: hidden;
       -webkit-tap-highlight-color: transparent;
     }
-    /* password screen */
+    /* ===== পাসওয়ার্ড স্ক্রিন ===== */
     #password-overlay {
       position: fixed;
       inset: 0;
@@ -92,9 +93,13 @@
     .password-box button:hover { background: #3f4c5c; }
     .lock-icon { font-size: 2.6rem; margin-bottom: 0.5rem; color: #a0b3cc; }
 
-    /* MAIN GALLERY */
-    .gallery-container { max-width: 1600px; margin: 0 auto; padding: 1.2rem 1.5rem 4rem; }
-    /* header */
+    /* ===== গ্যালারি কন্টেইনার ===== */
+    .gallery-container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 1.2rem 1.5rem 4rem;
+    }
+    /* হেডার */
     .gallery-header {
       display: flex;
       flex-wrap: wrap;
@@ -156,7 +161,7 @@
     }
     .filter-btn:hover { background: #2d3643; }
 
-    /* masonry grid */
+    /* ===== ম্যাসনরি গ্রিড ===== */
     .masonry {
       column-count: 4;
       column-gap: 16px;
@@ -173,7 +178,10 @@
       transition: transform 0.2s ease, box-shadow 0.2s;
       cursor: pointer;
     }
-    .masonry-item:hover { transform: scale(1.01); box-shadow: 0 20px 40px rgba(0,0,0,0.9); }
+    .masonry-item:hover {
+      transform: scale(1.01);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.9);
+    }
     .masonry-item img {
       width: 100%;
       display: block;
@@ -181,7 +189,7 @@
       user-select: none;
       -webkit-user-drag: none;
     }
-    /* watermark overlay */
+    /* ওয়াটারমার্ক */
     .watermark {
       position: absolute;
       bottom: 10px;
@@ -198,7 +206,8 @@
       pointer-events: none;
       text-transform: uppercase;
     }
-    /* loading */
+
+    /* ===== লোডিং স্পিনার ===== */
     .loading-spinner {
       text-align: center;
       padding: 2rem 0;
@@ -216,7 +225,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* lightbox */
+    /* ===== লাইটবক্স ===== */
     .lightbox {
       position: fixed;
       inset: 0;
@@ -284,7 +293,7 @@
     .lightbox-share i { cursor: pointer; opacity: 0.5; transition: 0.2s; }
     .lightbox-share i:hover { opacity: 1; color: white; }
 
-    /* footer */
+    /* ===== ফুটার ===== */
     .gallery-footer {
       text-align: center;
       padding: 3rem 0 1.5rem;
@@ -294,7 +303,7 @@
       margin-top: 2rem;
     }
 
-    /* Responsive */
+    /* ===== রেসপন্সিভ ===== */
     @media (max-width: 1200px) { .masonry { column-count: 3; } }
     @media (max-width: 800px) { .masonry { column-count: 2; } }
     @media (max-width: 520px) {
@@ -304,52 +313,53 @@
       .search-filter input { width: 100%; }
       .filter-buttons { justify-content: center; }
     }
-    /* disable selection / right-click */
+
+    /* প্রটেকশন: ইমেজে ড্র্যাগ/সিলেক্ট বন্ধ */
     img { -webkit-user-drag: none; user-select: none; pointer-events: none; }
     .masonry-item { user-select: none; }
   </style>
 </head>
 <body>
 
-<!-- PASSWORD OVERLAY -->
+<!-- ===== পাসওয়ার্ড ওভারলে ===== -->
 <div id="password-overlay">
   <div class="password-box">
     <div class="lock-icon"><i class="fas fa-lock"></i></div>
-    <h1>private gallery</h1>
-    <p>enter the access key</p>
+    <h1>প্রাইভেট গ্যালারি</h1>
+    <p>অ্যাক্সেস কী দিন</p>
     <input type="password" id="password-input" placeholder="••••••••" autofocus>
     <div class="error" id="password-error"></div>
-    <button id="password-submit"><i class="fas fa-arrow-right" style="margin-right: 8px;"></i>unlock</button>
+    <button id="password-submit"><i class="fas fa-arrow-right" style="margin-right: 8px;"></i>আনলক</button>
   </div>
 </div>
 
-<!-- GALLERY -->
+<!-- ===== গ্যালারি ===== -->
 <div class="gallery-container" id="galleryApp">
   <header class="gallery-header">
-    <h2>✦ premium</h2>
+    <h2>✦ প্রিমিয়াম</h2>
     <div class="search-filter">
-      <input type="text" id="searchInput" placeholder="search photos...">
+      <input type="text" id="searchInput" placeholder="ছবি খুঁজুন...">
       <div class="filter-buttons" id="filterContainer">
-        <button class="filter-btn active" data-filter="all">all</button>
-        <button class="filter-btn" data-filter="nature">nature</button>
-        <button class="filter-btn" data-filter="city">city</button>
-        <button class="filter-btn" data-filter="people">people</button>
-        <button class="filter-btn" data-filter="tech">tech</button>
+        <button class="filter-btn active" data-filter="all">সব</button>
+        <button class="filter-btn" data-filter="nature">প্রকৃতি</button>
+        <button class="filter-btn" data-filter="city">শহর</button>
+        <button class="filter-btn" data-filter="people">মানুষ</button>
+        <button class="filter-btn" data-filter="tech">টেক</button>
       </div>
     </div>
   </header>
 
   <div class="masonry" id="masonryGrid"></div>
-  <div class="loading-spinner" id="loadingIndicator"><div class="spinner"></div><p style="margin-top:8px;">loading more</p></div>
-  <div class="gallery-footer">© 2026 premium gallery · all rights reserved</div>
+  <div class="loading-spinner" id="loadingIndicator"><div class="spinner"></div><p style="margin-top:8px;">আরও লোড হচ্ছে...</p></div>
+  <div class="gallery-footer">© ২০২৬ প্রিমিয়াম গ্যালারি · সর্বস্বত্ব সংরক্ষিত</div>
 </div>
 
-<!-- LIGHTBOX -->
+<!-- ===== লাইটবক্স ===== -->
 <div class="lightbox" id="lightbox">
   <span class="lightbox-close" id="lightboxClose"><i class="fas fa-times"></i></span>
   <span class="lightbox-nav prev" id="lightboxPrev"><i class="fas fa-chevron-left"></i></span>
   <span class="lightbox-nav next" id="lightboxNext"><i class="fas fa-chevron-right"></i></span>
-  <img id="lightboxImg" src="" alt="preview">
+  <img id="lightboxImg" src="" alt="প্রিভিউ">
   <div class="lightbox-share">
     <i class="fab fa-twitter" id="shareTwitter"></i>
     <i class="fab fa-facebook" id="shareFacebook"></i>
@@ -359,10 +369,10 @@
 
 <script>
   (function() {
-    // ----------------------------------------
-    // 1. PASSWORD (session via localStorage)
-    // ----------------------------------------
-    const PASSWORD = "gallery2026";  // in production store in .env / config
+    // ========================================
+    // ১. পাসওয়ার্ড ব্যবস্থাপনা (localStorage)
+    // ========================================
+    const PASSWORD = "gallery2026";  // আপনার পছন্দের পাসওয়ার্ড দিন
     const overlay = document.getElementById('password-overlay');
     const passInput = document.getElementById('password-input');
     const passError = document.getElementById('password-error');
@@ -384,7 +394,7 @@
         passError.textContent = '';
         passInput.value = '';
       } else {
-        passError.textContent = '⨯ wrong password, try again';
+        passError.textContent = '⨯ ভুল পাসওয়ার্ড, আবার চেষ্টা করুন';
         passInput.value = '';
         passInput.focus();
       }
@@ -400,35 +410,10 @@
       overlay.classList.add('hidden');
     }
 
-    // ----------------------------------------
-    // 2. GALLERY DATA (simulated folder scan)
-    //    In production, PHP backend reads folder.
-    //    We use a static set with categories for demo.
-    // ----------------------------------------
-    const IMAGES = [
-      { id: 1, src: 'https://picsum.photos/id/1015/600/400', category: 'nature', title: 'Mountain lake' },
-      { id: 2, src: 'https://picsum.photos/id/1016/600/800', category: 'city', title: 'Street view' },
-      { id: 3, src: 'https://picsum.photos/id/1018/600/600', category: 'people', title: 'Portrait' },
-      { id: 4, src: 'https://picsum.photos/id/1020/600/500', category: 'tech', title: 'Keyboard' },
-      { id: 5, src: 'https://picsum.photos/id/1024/600/700', category: 'nature', title: 'Bird' },
-      { id: 6, src: 'https://picsum.photos/id/1025/600/400', category: 'city', title: 'Architecture' },
-      { id: 7, src: 'https://picsum.photos/id/1027/600/900', category: 'people', title: 'Dancer' },
-      { id: 8, src: 'https://picsum.photos/id/1035/600/600', category: 'tech', title: 'Laptop' },
-      { id: 9, src: 'https://picsum.photos/id/1039/600/450', category: 'nature', title: 'Waterfall' },
-      { id: 10, src: 'https://picsum.photos/id/1040/600/750', category: 'city', title: 'Night' },
-      { id: 11, src: 'https://picsum.photos/id/1044/600/550', category: 'people', title: 'Smile' },
-      { id: 12, src: 'https://picsum.photos/id/1049/600/680', category: 'tech', title: 'Code' },
-      { id: 13, src: 'https://picsum.photos/id/1055/600/420', category: 'nature', title: 'Sunset' },
-      { id: 14, src: 'https://picsum.photos/id/1060/600/800', category: 'city', title: 'Bridge' },
-      { id: 15, src: 'https://picsum.photos/id/1062/600/500', category: 'people', title: 'Group' },
-      { id: 16, src: 'https://picsum.photos/id/1066/600/700', category: 'tech', title: 'Drone' },
-    ];
-
-    // add watermark text
-    const WATERMARK = '✦ PREMIUM';
-
-    // state
-    let allImages = IMAGES.map(img => ({ ...img }));
+    // ========================================
+    // ২. JSON থেকে ছবি লোড করা
+    // ========================================
+    let allImages = [];
     let currentFilter = 'all';
     let searchTerm = '';
     let visibleImages = [];
@@ -442,7 +427,7 @@
     const searchInput = document.getElementById('searchInput');
     const filterBtns = document.querySelectorAll('.filter-btn');
 
-    // Lightbox state
+    // লাইটবক্স স্টেট
     let lightboxImages = [];
     let lightboxIndex = 0;
     const lightbox = document.getElementById('lightbox');
@@ -451,23 +436,21 @@
     const prevBtn = document.getElementById('lightboxPrev');
     const nextBtn = document.getElementById('lightboxNext');
 
-    // ----------------------------------------
-    // 3. RENDER (with watermark & protection)
-    // ----------------------------------------
+    const WATERMARK = '✦ প্রিমিয়াম';
+
+    // ========================================
+    // ৩. রেন্ডার ফাংশন
+    // ========================================
     function renderImages(images) {
       if (images.length === 0) {
-        grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:3rem; color:#6a7b8c;">no images found</div>`;
+        grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:3rem; color:#6a7b8c;">কোনো ছবি পাওয়া যায়নি</div>`;
         return;
       }
       let html = '';
       images.forEach(img => {
-        // low-res preview: we use same src but in production use ?w=200 etc.
-        // For demo we use picsum with small size
-        const lowSrc = img.src.replace('/id/', '/id/') + '?w=200'; // not perfect but works
-        const fullSrc = img.src;
         html += `
-          <div class="masonry-item" data-id="${img.id}" data-category="${img.category}" data-title="${img.title}" data-full="${fullSrc}">
-            <img src="${fullSrc}" alt="${img.title}" loading="lazy" style="width:100%;display:block;">
+          <div class="masonry-item" data-id="${img.id}" data-category="${img.category}" data-title="${img.title}" data-full="${img.src}">
+            <img src="${img.src}" alt="${img.title}" loading="lazy" style="width:100%;display:block;">
             <div class="watermark">${WATERMARK}</div>
           </div>
         `;
@@ -482,7 +465,10 @@
       }
       if (searchTerm.trim() !== '') {
         const term = searchTerm.trim().toLowerCase();
-        filtered = filtered.filter(img => img.title.toLowerCase().includes(term) || img.category.includes(term));
+        filtered = filtered.filter(img => 
+          img.title.toLowerCase().includes(term) || 
+          img.category.includes(term)
+        );
       }
       return filtered;
     }
@@ -504,7 +490,6 @@
         return;
       }
 
-      // append to visibleImages
       visibleImages = visibleImages.concat(pageItems);
       renderImages(visibleImages);
       currentPage++;
@@ -513,9 +498,9 @@
 
       if (end >= filtered.length) {
         allLoaded = true;
-        loadingIndicator.innerHTML = '<p style="color:#4d5d6e;">— end of gallery —</p>';
+        loadingIndicator.innerHTML = '<p style="color:#4d5d6e;">— গ্যালারির শেষ —</p>';
       } else {
-        loadingIndicator.innerHTML = '<div class="spinner"></div><p style="margin-top:8px;">loading more</p>';
+        loadingIndicator.innerHTML = '<div class="spinner"></div><p style="margin-top:8px;">আরও লোড হচ্ছে...</p>';
       }
     }
 
@@ -523,15 +508,33 @@
       visibleImages = [];
       currentPage = 0;
       allLoaded = false;
-      loadingIndicator.innerHTML = '<div class="spinner"></div><p style="margin-top:8px;">loading more</p>';
+      loadingIndicator.innerHTML = '<div class="spinner"></div><p style="margin-top:8px;">আরও লোড হচ্ছে...</p>';
       loadingIndicator.style.display = 'block';
       grid.innerHTML = '';
       loadMore();
     }
 
-    // ----------------------------------------
-    // 4. FILTER & SEARCH
-    // ----------------------------------------
+    // ========================================
+    // ৪. JSON ডেটা লোড
+    // ========================================
+    fetch('images.json')
+      .then(res => {
+        if (!res.ok) throw new Error('JSON ফাইল পাওয়া যায়নি');
+        return res.json();
+      })
+      .then(data => {
+        allImages = data;
+        resetGallery();
+      })
+      .catch(err => {
+        console.error('JSON লোড করতে সমস্যা:', err);
+        allImages = [];
+        resetGallery();
+      });
+
+    // ========================================
+    // ৫. ফিল্টার ও সার্চ
+    // ========================================
     filterBtns.forEach(btn => {
       btn.addEventListener('click', function() {
         filterBtns.forEach(b => b.classList.remove('active'));
@@ -546,16 +549,16 @@
       resetGallery();
     });
 
-    // infinite scroll
+    // ইনফিনিটি স্ক্রল
     window.addEventListener('scroll', function() {
       if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 400) {
         loadMore();
       }
     });
 
-    // ----------------------------------------
-    // 5. LIGHTBOX
-    // ----------------------------------------
+    // ========================================
+    // ৬. লাইটবক্স
+    // ========================================
     function openLightbox(index) {
       if (!lightboxImages.length) return;
       lightboxIndex = index;
@@ -575,7 +578,7 @@
       const id = parseInt(item.dataset.id);
       const img = allImages.find(i => i.id === id);
       if (!img) return;
-      // build lightbox list from current visible
+      // লাইটবক্সের জন্য তালিকা তৈরি
       lightboxImages = visibleImages.map(i => ({ full: i.src, title: i.title }));
       const idx = lightboxImages.findIndex(i => i.full === img.src);
       if (idx !== -1) openLightbox(idx);
@@ -585,28 +588,40 @@
     document.addEventListener('keydown', function(e) {
       if (!lightbox.classList.contains('open')) return;
       if (e.key === 'Escape') closeLightboxFn();
-      if (e.key === 'ArrowLeft') { lightboxIndex = (lightboxIndex - 1 + lightboxImages.length) % lightboxImages.length; lightboxImg.src = lightboxImages[lightboxIndex].full; }
-      if (e.key === 'ArrowRight') { lightboxIndex = (lightboxIndex + 1) % lightboxImages.length; lightboxImg.src = lightboxImages[lightboxIndex].full; }
+      if (e.key === 'ArrowLeft') {
+        lightboxIndex = (lightboxIndex - 1 + lightboxImages.length) % lightboxImages.length;
+        lightboxImg.src = lightboxImages[lightboxIndex].full;
+      }
+      if (e.key === 'ArrowRight') {
+        lightboxIndex = (lightboxIndex + 1) % lightboxImages.length;
+        lightboxImg.src = lightboxImages[lightboxIndex].full;
+      }
     });
-    prevBtn.addEventListener('click', function() { lightboxIndex = (lightboxIndex - 1 + lightboxImages.length) % lightboxImages.length; lightboxImg.src = lightboxImages[lightboxIndex].full; });
-    nextBtn.addEventListener('click', function() { lightboxIndex = (lightboxIndex + 1) % lightboxImages.length; lightboxImg.src = lightboxImages[lightboxIndex].full; });
+    prevBtn.addEventListener('click', function() {
+      lightboxIndex = (lightboxIndex - 1 + lightboxImages.length) % lightboxImages.length;
+      lightboxImg.src = lightboxImages[lightboxIndex].full;
+    });
+    nextBtn.addEventListener('click', function() {
+      lightboxIndex = (lightboxIndex + 1) % lightboxImages.length;
+      lightboxImg.src = lightboxImages[lightboxIndex].full;
+    });
 
-    // Share
+    // সোশ্যাল শেয়ার
     document.getElementById('shareTwitter').addEventListener('click', function() {
       const url = encodeURIComponent(window.location.href);
-      window.open(`https://twitter.com/intent/tweet?url=${url}&text=Check%20this%20photo!`, '_blank');
+      window.open(`https://twitter.com/intent/tweet?url=${url}&text=চেক%20আউট%20এই%20ছবিটি!`, '_blank');
     });
     document.getElementById('shareFacebook').addEventListener('click', function() {
       const url = encodeURIComponent(window.location.href);
       window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
     });
     document.getElementById('shareLink').addEventListener('click', function() {
-      navigator.clipboard?.writeText(window.location.href).then(() => alert('Link copied!'));
+      navigator.clipboard?.writeText(window.location.href).then(() => alert('লিংক কপি করা হয়েছে!'));
     });
 
-    // ----------------------------------------
-    // 6. PROTECTION (right-click, drag, keys)
-    // ----------------------------------------
+    // ========================================
+    // ৭. প্রটেকশন (রাইট-ক্লিক, ড্র্যাগ, কী)
+    // ========================================
     document.addEventListener('contextmenu', e => e.preventDefault());
     document.addEventListener('dragstart', e => e.preventDefault());
     document.addEventListener('copy', e => e.preventDefault());
@@ -617,19 +632,7 @@
       if (e.key === 'F12') e.preventDefault();
     });
 
-    // ----------------------------------------
-    // INIT
-    // ----------------------------------------
-    resetGallery();
-    // if already authenticated, show gallery
-    if (localStorage.getItem('gallery_auth') === 'true') {
-      overlay.classList.add('hidden');
-    }
-
   })();
 </script>
-<!-- In production, use PHP to read folder and output JSON.
-     This demo uses static images with watermark overlay.
-     For full protection, implement server-side image serving with token. -->
 </body>
 </html>
