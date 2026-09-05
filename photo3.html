@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>প্রিমিয়াম গ্যালারি 2.0</title>
+  <!-- ফন্ট ও আইকন -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================
+       গ্লোবাল রিসেট ও বেসিক স্টাইল
+       ============================================ */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: #0a0c10;
+      color: #eef2f6;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+      min-height: 100vh;
+    }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #161c24; }
+    ::-webkit-scrollbar-thumb { background: #3a4553; border-radius: 10px; }
+
+    /* ============================================
+       পাসওয়ার্ড ওভারলে (প্রিমিয়াম)
+       ============================================ */
+    #password-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(6, 8, 12, 0.92);
+      backdrop-filter: blur(24px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    #password-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .password-box {
+      max-width: 420px;
+      width: 92%;
+      padding: 3rem 2.5rem;
+      background: rgba(24, 30, 38, 0.6);
+      backdrop-filter: blur(12px);
+      border-radius: 48px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.05);
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.06);
+      transition: transform 0.3s ease;
+    }
+    .password-box:hover { transform: scale(1.01); }
+    .password-box .lock-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: #b9c8dd;
+      background: rgba(255,255,255,0.04);
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: auto;
+      margin-right: auto;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .password-box h1 {
+      font-weight: 700;
+      font-size: 2.2rem;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, #f0f4fa, #b0c8dd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .password-box p {
+      color: #8d9fb0;
+      font-size: 0.95rem;
+      margin: 0.25rem 0 2rem;
+      font-weight: 300;
+      letter-spacing: 0.5px;
+    }
+    .password-box .input-group {
+      position: relative;
+      width: 100%;
+    }
+    .password-box input {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      border-radius: 60px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(0,0,0,0.3);
+      color: white;
+      font-size: 1rem;
+      outline: none;
+      transition: 0.3s;
+      backdrop-filter: blur(4px);
+    }
+    .password-box input:focus {
+      border-color: #6c8aaa;
+      background: rgba(0,0,0,0.4);
+      box-shadow: 0 0 0 3px rgba(108, 138, 170, 0.15);
+    }
+    .password-box .error {
+      color: #f27a7a;
+      font-size: 0.85rem;
+      margin: 0.6rem 0 0.2rem;
+      min-height: 1.8rem;
+      font-weight: 400;
+    }
+    .password-box button {
+      width: 100%;
+      padding: 1rem;
+      margin-top: 1.2rem;
+      background: linear-gradient(135deg, #3a4a5c, #2a3645);
+      border: none;
+      border-radius: 60px;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+      letter-spacing: 0.5px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+    .password-box button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+      background: linear-gradient(135deg, #4a5e72, #334153);
+    }
+
+    /* ============================================
+       গ্যালারি কন্টেইনার
+       ============================================ */
+    .gallery-container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 1.5rem 2rem 5rem;
+    }
+
+    /* হেডার (প্রিমিয়াম) */
+    .gallery-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem 0 2.2rem;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10, 12, 16, 0.6);
+      margin: -1.5rem -2rem 0;
+      padding: 1.5rem 2rem 2.2rem;
+      border-radius: 0 0 40px 40px;
+      transition: background 0.3s;
+    }
+    .gallery-header h2 {
+      font-weight: 700;
+      font-size: 2rem;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, #ffffff, #b0c8dd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .gallery-header h2 i {
+      font-size: 1.6rem;
+      -webkit-text-fill-color: initial;
+      color: #b9c8dd;
+      opacity: 0.6;
+    }
+    .search-filter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      align-items: center;
+    }
+    .search-filter input {
+      background: rgba(24, 30, 38, 0.7);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 40px;
+      padding: 0.7rem 1.4rem;
+      color: white;
+      font-size: 0.9rem;
+      width: 200px;
+      outline: none;
+      transition: 0.3s;
+    }
+    .search-filter input:focus {
+      border-color: rgba(108, 138, 170, 0.4);
+      background: rgba(24, 30, 38, 0.9);
+      box-shadow: 0 0 0 3px rgba(108, 138, 170, 0.08);
+    }
+    .search-filter input::placeholder { color: #6a7b8c; }
+    .filter-buttons {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.06);
+      color: #8d9fb0;
+      padding: 0.4rem 1.2rem;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: 0.3s;
+      text-transform: uppercase;
+      backdrop-filter: blur(4px);
+    }
+    .filter-btn.active {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(255,255,255,0.15);
+      color: white;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .filter-btn:hover {
+      background: rgba(255,255,255,0.04);
+      color: #eef2f6;
+    }
+
+    /* ============================================
+       ম্যাসনরি গ্রিড (প্রিমিয়াম)
+       ============================================ */
+    .masonry {
+      column-count: 4;
+      column-gap: 20px;
+      padding-top: 2.5rem;
+    }
+    .masonry-item {
+      break-inside: avoid;
+      margin-bottom: 20px;
+      position: relative;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #1a1f26;
+      min-height: 180px;
+      transform: translateY(30px);
+      opacity: 0;
+      animation: fadeUp 0.6s forwards;
+    }
+    .masonry-item:nth-child(1) { animation-delay: 0.05s; }
+    .masonry-item:nth-child(2) { animation-delay: 0.10s; }
+    .masonry-item:nth-child(3) { animation-delay: 0.15s; }
+    .masonry-item:nth-child(4) { animation-delay: 0.20s; }
+    .masonry-item:nth-child(5) { animation-delay: 0.25s; }
+    .masonry-item:nth-child(6) { animation-delay: 0.30s; }
+    .masonry-item:nth-child(7) { animation-delay: 0.35s; }
+    .masonry-item:nth-child(8) { animation-delay: 0.40s; }
+    .masonry-item:nth-child(9) { animation-delay: 0.45s; }
+    .masonry-item:nth-child(10) { animation-delay: 0.50s; }
+
+    @keyframes fadeUp {
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .masonry-item:hover {
+      transform: scale(1.02) translateY(-4px);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.9);
+    }
+    .masonry-item img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: contain;
+      max-height: 600px;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+      position: relative;
+      z-index: 2;
+      padding: 6px;
+      transition: transform 0.5s ease;
+    }
+    .masonry-item:hover img {
+      transform: scale(1.03);
+    }
+    /* প্রিমিয়াম ওয়াটারমার্ক */
+    .watermark {
+      position: absolute;
+      bottom: 14px;
+      right: 18px;
+      color: rgba(255,255,255,0.25);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      background: rgba(0,0,0,0.25);
+      backdrop-filter: blur(8px);
+      padding: 5px 16px;
+      border-radius: 40px;
+      border: 1px solid rgba(255,255,255,0.05);
+      pointer-events: none;
+      text-transform: uppercase;
+      z-index: 3;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* ============================================
+       লোডিং স্পিনার
+       ============================================ */
+    .loading-spinner {
+      text-align: center;
+      padding: 3rem 0;
+      color: #5d6d7e;
+      font-size: 0.9rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid rgba(255,255,255,0.04);
+      border-top: 3px solid #b0c8dd;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ============================================
+       লাইটবক্স (প্রিমিয়াম + জুম)
+       ============================================ */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 8, 12, 0.92);
+      backdrop-filter: blur(30px);
+      z-index: 9998;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 1.5rem;
+      animation: lightboxFade 0.3s ease;
+    }
+    @keyframes lightboxFade {
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .lightbox.open { display: flex; }
+    .lightbox .image-wrapper {
+      position: relative;
+      max-width: 90%;
+      max-height: 80vh;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.9);
+      background: #0a0c10;
+      touch-action: none;
+    }
+    .lightbox .image-wrapper img {
+      width: 100%;
+      height: 100%;
+      max-height: 80vh;
+      object-fit: contain;
+      display: block;
+      user-select: none;
+      -webkit-user-drag: none;
+      transition: transform 0.2s ease;
+      transform-origin: center center;
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 24px;
+      right: 30px;
+      color: rgba(255,255,255,0.6);
+      font-size: 2rem;
+      cursor: pointer;
+      transition: 0.3s;
+      background: rgba(0,0,0,0.3);
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .lightbox-close:hover { opacity: 1; background: rgba(255,255,255,0.08); color: white; }
+    .lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,0.3);
+      font-size: 2.4rem;
+      cursor: pointer;
+      padding: 1rem;
+      transition: 0.3s;
+      background: rgba(0,0,0,0.2);
+      border-radius: 50%;
+      width: 56px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+    .lightbox-nav:hover { opacity: 1; background: rgba(255,255,255,0.06); color: white; }
+    .lightbox-nav.prev { left: 20px; }
+    .lightbox-nav.next { right: 20px; }
+    .lightbox-share {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 1.8rem;
+      color: rgba(255,255,255,0.4);
+      font-size: 1.4rem;
+      background: rgba(0,0,0,0.2);
+      padding: 0.6rem 1.8rem;
+      border-radius: 60px;
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+    .lightbox-share i { cursor: pointer; transition: 0.3s; }
+    .lightbox-share i:hover { opacity: 1; color: white; transform: scale(1.1); }
+
+    /* ============================================
+       ফুটার
+       ============================================ */
+    .gallery-footer {
+      text-align: center;
+      padding: 3rem 0 1.5rem;
+      color: #4a5a6a;
+      font-size: 0.8rem;
+      border-top: 1px solid rgba(255,255,255,0.03);
+      margin-top: 3rem;
+      font-weight: 300;
+      letter-spacing: 0.5px;
+    }
+
+    /* ============================================
+       রেসপন্সিভ
+       ============================================ */
+    @media (max-width: 1200px) { .masonry { column-count: 3; } }
+    @media (max-width: 800px) {
+      .masonry { column-count: 2; column-gap: 14px; }
+      .gallery-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.8rem;
+        padding: 1.2rem 1.5rem 1.8rem;
+        margin: -1.2rem -1.5rem 0;
+        border-radius: 0 0 28px 28px;
+      }
+      .search-filter { flex-direction: column; align-items: stretch; }
+      .search-filter input { width: 100%; }
+      .filter-buttons { justify-content: center; }
+    }
+    @media (max-width: 520px) {
+      .masonry { column-count: 1; column-gap: 0; }
+      .gallery-container { padding: 1rem 1rem 3rem; }
+      .lightbox-nav { width: 40px; height: 40px; font-size: 1.6rem; }
+      .lightbox-nav.prev { left: 8px; }
+      .lightbox-nav.next { right: 8px; }
+      .lightbox-share { gap: 1.2rem; font-size: 1.2rem; padding: 0.4rem 1.2rem; }
+      .password-box { padding: 2rem 1.5rem; }
+    }
+
+    /* প্রটেকশন */
+    img { -webkit-user-drag: none; user-select: none; pointer-events: none; }
+    .masonry-item { user-select: none; }
+  </style>
+</head>
+<body>
+
+<!-- ===== পাসওয়ার্ড ওভারলে ===== -->
+<div id="password-overlay">
+  <div class="password-box">
+    <div class="lock-icon"><i class="fas fa-key"></i></div>
+    <h1>প্রাইভেট গ্যালারি</h1>
+    <p>অ্যাক্সেস কী দিন</p>
+    <div class="input-group">
+      <input type="password" id="password-input" placeholder="••••••••" autofocus>
+    </div>
+    <div class="error" id="password-error"></div>
+    <button id="password-submit"><i class="fas fa-arrow-right" style="margin-right: 10px;"></i>আনলক করুন</button>
+  </div>
+</div>
+
+<!-- ===== গ্যালারি ===== -->
+<div class="gallery-container" id="galleryApp">
+  <header class="gallery-header">
+    <h2><i class="fas fa-crown"></i> প্রিমিয়াম</h2>
+    <div class="search-filter">
+      <input type="text" id="searchInput" placeholder="ছবি খুঁজুন...">
+      <div class="filter-buttons" id="filterContainer">
+        <button class="filter-btn active" data-filter="all">সব</button>
+        <button class="filter-btn" data-filter="nature">প্রকৃতি</button>
+        <button class="filter-btn" data-filter="city">শহর</button>
+        <button class="filter-btn" data-filter="people">মানুষ</button>
+        <button class="filter-btn" data-filter="tech">টেক</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="masonry" id="masonryGrid"></div>
+  <div class="loading-spinner" id="loadingIndicator">
+    <div class="spinner"></div>
+    <span>আরও লোড হচ্ছে...</span>
+  </div>
+  <div class="gallery-footer">© ২০২৬ প্রিমিয়াম গ্যালারি · সর্বস্বত্ব সংরক্ষিত</div>
+</div>
+
+<!-- ===== লাইটবক্স ===== -->
+<div class="lightbox" id="lightbox">
+  <span class="lightbox-close" id="lightboxClose"><i class="fas fa-times"></i></span>
+  <span class="lightbox-nav prev" id="lightboxPrev"><i class="fas fa-chevron-left"></i></span>
+  <span class="lightbox-nav next" id="lightboxNext"><i class="fas fa-chevron-right"></i></span>
+  <div class="image-wrapper" id="lightboxWrapper">
+    <img id="lightboxImg" src="" alt="প্রিভিউ">
+  </div>
+  <div class="lightbox-share">
+    <i class="fab fa-twitter" id="shareTwitter"></i>
+    <i class="fab fa-facebook" id="shareFacebook"></i>
+    <i class="fas fa-link" id="shareLink"></i>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ============================================
+    // ১. পাসওয়ার্ড (localStorage)
+    // ============================================
+    const PASSWORD = "gallery2026";
+    const overlay = document.getElementById('password-overlay');
+    const passInput = document.getElementById('password-input');
+    const passError = document.getElementById('password-error');
+    const passSubmit = document.getElementById('password-submit');
+
+    function checkSession() {
+      if (localStorage.getItem('gallery_auth') === 'true') {
+        overlay.classList.add('hidden');
+        return true;
+      }
+      return false;
+    }
+    function unlock() {
+      const val = passInput.value.trim();
+      if (val === PASSWORD) {
+        localStorage.setItem('gallery_auth', 'true');
+        overlay.classList.add('hidden');
+        passError.textContent = '';
+        passInput.value = '';
+      } else {
+        passError.textContent = '⨯ ভুল পাসওয়ার্ড, আবার চেষ্টা করুন';
+        passInput.value = '';
+        passInput.focus();
+      }
+    }
+    passSubmit.addEventListener('click', unlock);
+    passInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') unlock(); });
+    if (!checkSession()) { overlay.classList.remove('hidden'); passInput.focus(); }
+    else { overlay.classList.add('hidden'); }
+
+    // ============================================
+    // ২. কালারফুল ব্যাকগ্রাউন্ড জেনারেটর (প্রিমিয়াম)
+    // ============================================
+    function generateGradient() {
+      const palettes = [
+        ['#ff6b6b', '#feca57', '#48dbfb'],
+        ['#a29bfe', '#fd79a8', '#fdcb6e'],
+        ['#00cec9', '#6c5ce7', '#fd79a8'],
+        ['#fdcb6e', '#e17055', '#00b894'],
+        ['#74b9ff', '#a29bfe', '#fd79a8'],
+        ['#55efc4', '#81ecec', '#74b9ff'],
+        ['#ff7675', '#fdcb6e', '#55efc4'],
+        ['#6c5ce7', '#0984e3', '#00cec9'],
+        ['#e17055', '#fdcb6e', '#00b894'],
+        ['#fd79a8', '#6c5ce7', '#0984e3'],
+        ['#f8a5c2', '#f3a683', '#f7d794'],
+        ['#cf6a87', '#c44569', '#574b90']
+      ];
+      const pal = palettes[Math.floor(Math.random() * palettes.length)];
+      const angle = Math.floor(Math.random() * 360);
+      return `linear-gradient(${angle}deg, ${pal[0]}, ${pal[1]}, ${pal[2]})`;
+    }
+
+    // ============================================
+    // ৩. গ্যালারি লজিক
+    // ============================================
+    let allImages = [];
+    let currentFilter = 'all';
+    let searchTerm = '';
+    let visibleImages = [];
+    let currentPage = 0;
+    const PAGE_SIZE = 8;
+    let isLoading = false;
+    let allLoaded = false;
+
+    const grid = document.getElementById('masonryGrid');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const searchInput = document.getElementById('searchInput');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+
+    let lightboxImages = [];
+    let lightboxIndex = 0;
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxWrapper = document.getElementById('lightboxWrapper');
+    const closeLightbox = document.getElementById('lightboxClose');
+    const prevBtn = document.getElementById('lightboxPrev');
+    const nextBtn = document.getElementById('lightboxNext');
+
+    const WATERMARK = '✦ প্রিমিয়াম';
+
+    function renderImages(images) {
+      if (images.length === 0) {
+        grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:3rem; color:#6a7b8c; font-weight:300;">কোনো ছবি পাওয়া যায়নি</div>`;
+        return;
+      }
+      let html = '';
+      images.forEach(img => {
+        const gradient = generateGradient();
+        html += `
+          <div class="masonry-item" data-id="${img.id}" data-category="${img.category}" data-title="${img.title}" data-full="${img.src}" style="background: ${gradient};">
+            <img src="${img.src}" alt="${img.title}" loading="lazy">
+            <div class="watermark">${WATERMARK}</div>
+          </div>
+        `;
+      });
+      grid.innerHTML = html;
+    }
+
+    function getFiltered() {
+      let filtered = allImages;
+      if (currentFilter !== 'all') {
+        filtered = filtered.filter(img => img.category === currentFilter);
+      }
+      if (searchTerm.trim() !== '') {
+        const term = searchTerm.trim().toLowerCase();
+        filtered = filtered.filter(img =>
+          img.title.toLowerCase().includes(term) ||
+          img.category.includes(term)
+        );
+      }
+      return filtered;
+    }
+
+    function loadMore() {
+      if (isLoading || allLoaded) return;
+      isLoading = true;
+      loadingIndicator.style.display = 'flex';
+
+      const filtered = getFiltered();
+      const start = currentPage * PAGE_SIZE;
+      const end = start + PAGE_SIZE;
+      const pageItems = filtered.slice(start, end);
+
+      if (pageItems.length === 0) {
+        allLoaded = true;
+        loadingIndicator.style.display = 'none';
+        isLoading = false;
+        return;
+      }
+
+      visibleImages = visibleImages.concat(pageItems);
+      renderImages(visibleImages);
+      currentPage++;
+      isLoading = false;
+      loadingIndicator.style.display = 'none';
+
+      if (end >= filtered.length) {
+        allLoaded = true;
+        loadingIndicator.innerHTML = '<span style="color:#4a5a6a;">— গ্যালারির শেষ —</span>';
+      } else {
+        loadingIndicator.innerHTML = '<div class="spinner"></div><span>আরও লোড হচ্ছে...</span>';
+      }
+    }
+
+    function resetGallery() {
+      visibleImages = [];
+      currentPage = 0;
+      allLoaded = false;
+      loadingIndicator.innerHTML = '<div class="spinner"></div><span>আরও লোড হচ্ছে...</span>';
+      loadingIndicator.style.display = 'flex';
+      grid.innerHTML = '';
+      loadMore();
+    }
+
+    // JSON লোড
+    fetch('images.json')
+      .then(res => {
+        if (!res.ok) throw new Error('JSON ফাইল পাওয়া যায়নি');
+        return res.json();
+      })
+      .then(data => {
+        allImages = data;
+        resetGallery();
+      })
+      .catch(err => {
+        console.error('JSON লোড করতে সমস্যা:', err);
+        allImages = [];
+        resetGallery();
+      });
+
+    // ফিল্টার ও সার্চ
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        currentFilter = this.dataset.filter;
+        resetGallery();
+      });
+    });
+    searchInput.addEventListener('input', function() {
+      searchTerm = this.value;
+      resetGallery();
+    });
+
+    // ইনফিনিটি স্ক্রল
+    window.addEventListener('scroll', function() {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 400) {
+        loadMore();
+      }
+    });
+
+    // ============================================
+    // ৪. লাইটবক্স + পিন্চ জুম
+    // ============================================
+    let scale = 1;
+    let startX, startY, currentX = 0, currentY = 0;
+    let isDragging = false;
+
+    function openLightbox(index) {
+      if (!lightboxImages.length) return;
+      lightboxIndex = index;
+      lightboxImg.src = lightboxImages[index].full;
+      lightbox.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      scale = 1;
+      lightboxImg.style.transform = `scale(1) translate(0px, 0px)`;
+    }
+    function closeLightboxFn() {
+      lightbox.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // জুম (মাউস হুইল)
+    lightboxWrapper.addEventListener('wheel', function(e) {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.1 : 0.1;
+      scale = Math.min(Math.max(scale + delta, 0.5), 3);
+      lightboxImg.style.transform = `scale(${scale}) translate(${currentX}px, ${currentY}px)`;
+    }, { passive: false });
+
+    // পিন্চ জুম (টাচ)
+    let initialPinchDist = 0;
+    lightboxWrapper.addEventListener('touchstart', function(e) {
+      if (e.touches.length === 2) {
+        const t1 = e.touches[0];
+        const t2 = e.touches[1];
+        initialPinchDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+      }
+    });
+    lightboxWrapper.addEventListener('touchmove', function(e) {
+      if (e.touches.length === 2) {
+        const t1 = e.touches[0];
+        const t2 = e.touches[1];
+        const dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+        const delta = (dist - initialPinchDist) / 200;
+        scale = Math.min(Math.max(scale + delta, 0.5), 3);
+        lightboxImg.style.transform = `scale(${scale}) translate(${currentX}px, ${currentY}px)`;
+        initialPinchDist = dist;
+      }
+    });
+
+    // ড্র্যাগ (মাউস)
+    lightboxWrapper.addEventListener('mousedown', function(e) {
+      if (scale <= 1) return;
+      isDragging = true;
+      startX = e.clientX - currentX;
+      startY = e.clientY - currentY;
+      lightboxWrapper.style.cursor = 'grabbing';
+    });
+    document.addEventListener('mousemove', function(e) {
+      if (!isDragging) return;
+      currentX = e.clientX - startX;
+      currentY = e.clientY - startY;
+      lightboxImg.style.transform = `scale(${scale}) translate(${currentX}px, ${currentY}px)`;
+    });
+    document.addEventListener('mouseup', function() {
+      isDragging = false;
+      lightboxWrapper.style.cursor = 'default';
+    });
+
+    // ক্লোজ ও নেভিগেশন
+    closeLightbox.addEventListener('click', closeLightboxFn);
+    document.addEventListener('keydown', function(e) {
+      if (!lightbox.classList.contains('open')) return;
+      if (e.key === 'Escape') closeLightboxFn();
+      if (e.key === 'ArrowLeft') {
+        lightboxIndex = (lightboxIndex - 1 + lightboxImages.length) % lightboxImages.length;
+        lightboxImg.src = lightboxImages[lightboxIndex].full;
+        scale = 1;
+        currentX = 0; currentY = 0;
+        lightboxImg.style.transform = `scale(1) translate(0px, 0px)`;
+      }
+      if (e.key === 'ArrowRight') {
+        lightboxIndex = (lightboxIndex + 1) % lightboxImages.length;
+        lightboxImg.src = lightboxImages[lightboxIndex].full;
+        scale = 1;
+        currentX = 0; currentY = 0;
+        lightboxImg.style.transform = `scale(1) translate(0px, 0px)`;
+      }
+    });
+    prevBtn.addEventListener('click', function() {
+      lightboxIndex = (lightboxIndex - 1 + lightboxImages.length) % lightboxImages.length;
+      lightboxImg.src = lightboxImages[lightboxIndex].full;
+      scale = 1; currentX = 0; currentY = 0;
+      lightboxImg.style.transform = `scale(1) translate(0px, 0px)`;
+    });
+    nextBtn.addEventListener('click', function() {
+      lightboxIndex = (lightboxIndex + 1) % lightboxImages.length;
+      lightboxImg.src = lightboxImages[lightboxIndex].full;
+      scale = 1; currentX = 0; currentY = 0;
+      lightboxImg.style.transform = `scale(1) translate(0px, 0px)`;
+    });
+
+    grid.addEventListener('click', function(e) {
+      const item = e.target.closest('.masonry-item');
+      if (!item) return;
+      const id = parseInt(item.dataset.id);
+      const img = allImages.find(i => i.id === id);
+      if (!img) return;
+      lightboxImages = visibleImages.map(i => ({ full: i.src, title: i.title }));
+      const idx = lightboxImages.findIndex(i => i.full === img.src);
+      if (idx !== -1) openLightbox(idx);
+    });
+
+    // সোশ্যাল শেয়ার
+    document.getElementById('shareTwitter').addEventListener('click', function() {
+      const url = encodeURIComponent(window.location.href);
+      window.open(`https://twitter.com/intent/tweet?url=${url}&text=চেক%20আউট%20এই%20ছবিটি!`, '_blank');
+    });
+    document.getElementById('shareFacebook').addEventListener('click', function() {
+      const url = encodeURIComponent(window.location.href);
+      window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+    });
+    document.getElementById('shareLink').addEventListener('click', function() {
+      navigator.clipboard?.writeText(window.location.href).then(() => alert('লিংক কপি করা হয়েছে!'));
+    });
+
+    // ============================================
+    // ৫. প্রটেকশন
+    // ============================================
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('dragstart', e => e.preventDefault());
+    document.addEventListener('copy', e => e.preventDefault());
+    document.addEventListener('keydown', function(e) {
+      if (e.ctrlKey && (e.key === 's' || e.key === 'S' || e.key === 'u' || e.key === 'U' || e.key === 'i' || e.key === 'I')) {
+        e.preventDefault();
+      }
+      if (e.key === 'F12') e.preventDefault();
+    });
+
+  })();
+</script>
+</body>
+</html>
