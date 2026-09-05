@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PREMIUM GALLERY · DARK</title>
+  <!-- Font & Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0b0d10;
+      color: #eaeef2;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+    /* password screen */
+    #password-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(8, 10, 14, 0.94);
+      backdrop-filter: blur(18px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      transition: opacity 0.6s ease;
+    }
+    #password-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .password-box {
+      max-width: 400px;
+      width: 90%;
+      padding: 2.5rem 2rem;
+      background: #181c22;
+      border-radius: 36px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+      text-align: center;
+      border: 1px solid #2d333b;
+    }
+    .password-box h1 {
+      font-weight: 600;
+      font-size: 2rem;
+      letter-spacing: -0.5px;
+      margin-bottom: 0.25rem;
+    }
+    .password-box p {
+      color: #9aa4b0;
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+    }
+    .password-box input {
+      width: 100%;
+      padding: 1rem 1.2rem;
+      border-radius: 60px;
+      border: 1px solid #2f3640;
+      background: #11151b;
+      color: white;
+      font-size: 1rem;
+      outline: none;
+      transition: 0.2s;
+    }
+    .password-box input:focus {
+      border-color: #6c7a8a;
+      background: #0f1319;
+    }
+    .password-box .error {
+      color: #f27a7a;
+      font-size: 0.9rem;
+      margin: 0.75rem 0 0.25rem;
+      min-height: 1.8rem;
+    }
+    .password-box button {
+      width: 100%;
+      padding: 1rem;
+      margin-top: 1.2rem;
+      background: #2f3a47;
+      border: none;
+      border-radius: 60px;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.2s;
+      letter-spacing: 0.3px;
+    }
+    .password-box button:hover { background: #3f4c5c; }
+    .lock-icon { font-size: 2.6rem; margin-bottom: 0.5rem; color: #a0b3cc; }
+
+    /* MAIN GALLERY */
+    .gallery-container { max-width: 1600px; margin: 0 auto; padding: 1.2rem 1.5rem 4rem; }
+    /* header */
+    .gallery-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.2rem 0 1.8rem;
+      border-bottom: 1px solid #21262e;
+    }
+    .gallery-header h2 {
+      font-weight: 600;
+      font-size: 1.8rem;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #eef2f6, #b6c8d9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .search-filter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      align-items: center;
+    }
+    .search-filter input {
+      background: #181d24;
+      border: 1px solid #2c333d;
+      border-radius: 40px;
+      padding: 0.7rem 1.4rem;
+      color: white;
+      font-size: 0.9rem;
+      width: 200px;
+      outline: none;
+      transition: 0.2s;
+    }
+    .search-filter input:focus { border-color: #5b6c80; background: #141a21; }
+    .search-filter input::placeholder { color: #6b7a8a; }
+    .filter-buttons {
+      display: flex;
+      gap: 0.3rem;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      background: transparent;
+      border: 1px solid #2e3641;
+      color: #b0c0cf;
+      padding: 0.4rem 1rem;
+      border-radius: 40px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      transition: 0.15s;
+      text-transform: uppercase;
+    }
+    .filter-btn.active {
+      background: #3b4656;
+      border-color: #5b6d82;
+      color: white;
+    }
+    .filter-btn:hover { background: #2d3643; }
+
+    /* masonry grid */
+    .masonry {
+      column-count: 4;
+      column-gap: 16px;
+      padding-top: 1.8rem;
+    }
+    .masonry-item {
+      break-inside: avoid;
+      margin-bottom: 16px;
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      background: #13181f;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.7);
+      transition: transform 0.2s ease, box-shadow 0.2s;
+      cursor: pointer;
+    }
+    .masonry-item:hover { transform: scale(1.01); box-shadow: 0 20px 40px rgba(0,0,0,0.9); }
+    .masonry-item img {
+      width: 100%;
+      display: block;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+    /* watermark overlay */
+    .watermark {
+      position: absolute;
+      bottom: 10px;
+      right: 14px;
+      color: rgba(255,255,255,0.3);
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      background: rgba(0,0,0,0.3);
+      backdrop-filter: blur(4px);
+      padding: 4px 12px;
+      border-radius: 40px;
+      border: 1px solid rgba(255,255,255,0.05);
+      pointer-events: none;
+      text-transform: uppercase;
+    }
+    /* loading */
+    .loading-spinner {
+      text-align: center;
+      padding: 2rem 0;
+      color: #7e8d9e;
+      font-size: 0.9rem;
+    }
+    .spinner {
+      display: inline-block;
+      width: 32px;
+      height: 32px;
+      border: 3px solid #2d3643;
+      border-top: 3px solid #b6c8d9;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* lightbox */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      backdrop-filter: blur(16px);
+      z-index: 9998;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 1.5rem;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox img {
+      max-width: 90%;
+      max-height: 80vh;
+      border-radius: 24px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.9);
+      object-fit: contain;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 24px;
+      right: 30px;
+      color: white;
+      font-size: 2rem;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: 0.2s;
+      background: rgba(0,0,0,0.3);
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .lightbox-close:hover { opacity: 1; background: rgba(255,255,255,0.1); }
+    .lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      color: white;
+      font-size: 2.2rem;
+      opacity: 0.4;
+      cursor: pointer;
+      padding: 0.8rem;
+      transition: 0.2s;
+    }
+    .lightbox-nav:hover { opacity: 1; }
+    .lightbox-nav.prev { left: 20px; }
+    .lightbox-nav.next { right: 20px; }
+    .lightbox-share {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 1.4rem;
+      color: #ccc;
+      font-size: 1.5rem;
+    }
+    .lightbox-share i { cursor: pointer; opacity: 0.5; transition: 0.2s; }
+    .lightbox-share i:hover { opacity: 1; color: white; }
+
+    /* footer */
+    .gallery-footer {
+      text-align: center;
+      padding: 3rem 0 1.5rem;
+      color: #5d6d7e;
+      font-size: 0.8rem;
+      border-top: 1px solid #1f252e;
+      margin-top: 2rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) { .masonry { column-count: 3; } }
+    @media (max-width: 800px) { .masonry { column-count: 2; } }
+    @media (max-width: 520px) {
+      .masonry { column-count: 1; }
+      .gallery-header { flex-direction: column; align-items: stretch; gap: 0.8rem; }
+      .search-filter { flex-direction: column; align-items: stretch; }
+      .search-filter input { width: 100%; }
+      .filter-buttons { justify-content: center; }
+    }
+    /* disable selection / right-click */
+    img { -webkit-user-drag: none; user-select: none; pointer-events: none; }
+    .masonry-item { user-select: none; }
+  </style>
+</head>
+<body>
+
+<!-- PASSWORD OVERLAY -->
+<div id="password-overlay">
+  <div class="password-box">
+    <div class="lock-icon"><i class="fas fa-lock"></i></div>
+    <h1>private gallery</h1>
+    <p>enter the access key</p>
+    <input type="password" id="password-input" placeholder="••••••••" autofocus>
+    <div class="error" id="password-error"></div>
+    <button id="password-submit"><i class="fas fa-arrow-right" style="margin-right: 8px;"></i>unlock</button>
+  </div>
+</div>
+
+<!-- GALLERY -->
+<div class="gallery-container" id="galleryApp">
+  <header class="gallery-header">
+    <h2>✦ premium</h2>
+    <div class="search-filter">
+      <input type="text" id="searchInput" placeholder="search photos...">
+      <div class="filter-buttons" id="filterContainer">
+        <button class="filter-btn active" data-filter="all">all</button>
+        <button class="filter-btn" data-filter="nature">nature</button>
+        <button class="filter-btn" data-filter="city">city</button>
+        <button class="filter-btn" data-filter="people">people</button>
+        <button class="filter-btn" data-filter="tech">tech</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="masonry" id="masonryGrid"></div>
+  <div class="loading-spinner" id="loadingIndicator"><div class="spinner"></div><p style="margin-top:8px;">loading more</p></div>
+  <div class="gallery-footer">© 2026 premium gallery · all rights reserved</div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <span class="lightbox-close" id="lightboxClose"><i class="fas fa-times"></i></span>
+  <span class="lightbox-nav prev" id="lightboxPrev"><i class="fas fa-chevron-left"></i></span>
+  <span class="lightbox-nav next" id="lightboxNext"><i class="fas fa-chevron-right"></i></span>
+  <img id="lightboxImg" src="" alt="preview">
+  <div class="lightbox-share">
+    <i class="fab fa-twitter" id="shareTwitter"></i>
+    <i class="fab fa-facebook" id="shareFacebook"></i>
+    <i class="fas fa-link" id="shareLink"></i>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ----------------------------------------
+    // 1. PASSWORD (session via localStorage)
+    // ----------------------------------------
+    const PASSWORD = "gallery2026";  // in production store in .env / config
+    const overlay = document.getElementById('password-overlay');
+    const passInput = document.getElementById('password-input');
+    const passError = document.getElementById('password-error');
+    const passSubmit = document.getElementById('password-submit');
+
+    function checkSession() {
+      if (localStorage.getItem('gallery_auth') === 'true') {
+        overlay.classList.add('hidden');
+        return true;
+      }
+      return false;
+    }
+
+    function unlock() {
+      const val = passInput.value.trim();
+      if (val === PASSWORD) {
+        localStorage.setItem('gallery_auth', 'true');
+        overlay.classList.add('hidden');
+        passError.textContent = '';
+        passInput.value = '';
+      } else {
+        passError.textContent = '⨯ wrong password, try again';
+        passInput.value = '';
+        passInput.focus();
+      }
+    }
+
+    passSubmit.addEventListener('click', unlock);
+    passInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') unlock(); });
+
+    if (!checkSession()) {
+      overlay.classList.remove('hidden');
+      passInput.focus();
+    } else {
+      overlay.classList.add('hidden');
+    }
+
+    // ----------------------------------------
+    // 2. GALLERY DATA (simulated folder scan)
+    //    In production, PHP backend reads folder.
+    //    We use a static set with categories for demo.
+    // ----------------------------------------
+    const IMAGES = [
+      { id: 1, src: 'https://picsum.photos/id/1015/600/400', category: 'nature', title: 'Mountain lake' },
+      { id: 2, src: 'https://picsum.photos/id/1016/600/800', category: 'city', title: 'Street view' },
+      { id: 3, src: 'https://picsum.photos/id/1018/600/600', category: 'people', title: 'Portrait' },
+      { id: 4, src: 'https://picsum.photos/id/1020/600/500', category: 'tech', title: 'Keyboard' },
+      { id: 5, src: 'https://picsum.photos/id/1024/600/700', category: 'nature', title: 'Bird' },
+      { id: 6, src: 'https://picsum.photos/id/1025/600/400', category: 'city', title: 'Architecture' },
+      { id: 7, src: 'https://picsum.photos/id/1027/600/900', category: 'people', title: 'Dancer' },
+      { id: 8, src: 'https://picsum.photos/id/1035/600/600', category: 'tech', title: 'Laptop' },
+      { id: 9, src: 'https://picsum.photos/id/1039/600/450', category: 'nature', title: 'Waterfall' },
+      { id: 10, src: 'https://picsum.photos/id/1040/600/750', category: 'city', title: 'Night' },
+      { id: 11, src: 'https://picsum.photos/id/1044/600/550', category: 'people', title: 'Smile' },
+      { id: 12, src: 'https://picsum.photos/id/1049/600/680', category: 'tech', title: 'Code' },
+      { id: 13, src: 'https://picsum.photos/id/1055/600/420', category: 'nature', title: 'Sunset' },
+      { id: 14, src: 'https://picsum.photos/id/1060/600/800', category: 'city', title: 'Bridge' },
+      { id: 15, src: 'https://picsum.photos/id/1062/600/500', category: 'people', title: 'Group' },
+      { id: 16, src: 'https://picsum.photos/id/1066/600/700', category: 'tech', title: 'Drone' },
+    ];
+
+    // add watermark text
+    const WATERMARK = '✦ PREMIUM';
+
+    // state
+    let allImages = IMAGES.map(img => ({ ...img }));
+    let currentFilter = 'all';
+    let searchTerm = '';
+    let visibleImages = [];
+    let currentPage = 0;
+    const PAGE_SIZE = 8;
+    let isLoading = false;
+    let allLoaded = false;
+
+    const grid = document.getElementById('masonryGrid');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const searchInput = document.getElementById('searchInput');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+
+    // Lightbox state
+    let lightboxImages = [];
+    let lightboxIndex = 0;
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const closeLightbox = document.getElementById('lightboxClose');
+    const prevBtn = document.getElementById('lightboxPrev');
+    const nextBtn = document.getElementById('lightboxNext');
+
+    // ----------------------------------------
+    // 3. RENDER (with watermark & protection)
+    // ----------------------------------------
+    function renderImages(images) {
+      if (images.length === 0) {
+        grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:3rem; color:#6a7b8c;">no images found</div>`;
+        return;
+      }
+      let html = '';
+      images.forEach(img => {
+        // low-res preview: we use same src but in production use ?w=200 etc.
+        // For demo we use picsum with small size
+        const lowSrc = img.src.replace('/id/', '/id/') + '?w=200'; // not perfect but works
+        const fullSrc = img.src;
+        html += `
+          <div class="masonry-item" data-id="${img.id}" data-category="${img.category}" data-title="${img.title}" data-full="${fullSrc}">
+            <img src="${fullSrc}" alt="${img.title}" loading="lazy" style="width:100%;display:block;">
+            <div class="watermark">${WATERMARK}</div>
+          </div>
+        `;
+      });
+      grid.innerHTML = html;
+    }
+
+    function getFiltered() {
+      let filtered = allImages;
+      if (currentFilter !== 'all') {
+        filtered = filtered.filter(img => img.category === currentFilter);
+      }
+      if (searchTerm.trim() !== '') {
+        const term = searchTerm.trim().toLowerCase();
+        filtered = filtered.filter(img => img.title.toLowerCase().includes(term) || img.category.includes(term));
+      }
+      return filtered;
+    }
+
+    function loadMore() {
+      if (isLoading || allLoaded) return;
+      isLoading = true;
+      loadingIndicator.style.display = 'block';
+
+      const filtered = getFiltered();
+      const start = currentPage * PAGE_SIZE;
+      const end = start + PAGE_SIZE;
+      const pageItems = filtered.slice(start, end);
+
+      if (pageItems.length === 0) {
+        allLoaded = true;
+        loadingIndicator.style.display = 'none';
+        isLoading = false;
+        return;
+      }
+
+      // append to visibleImages
+      visibleImages = visibleImages.concat(pageItems);
+      renderImages(visibleImages);
+      currentPage++;
+      isLoading = false;
+      loadingIndicator.style.display = 'none';
+
+      if (end >= filtered.length) {
+        allLoaded = true;
+        loadingIndicator.innerHTML = '<p style="color:#4d5d6e;">— end of gallery —</p>';
+      } else {
+        loadingIndicator.innerHTML = '<div class="spinner"></div><p style="margin-top:8px;">loading more</p>';
+      }
+    }
+
+    function resetGallery() {
+      visibleImages = [];
+      currentPage = 0;
+      allLoaded = false;
+      loadingIndicator.innerHTML = '<div class="spinner"></div><p style="margin-top:8px;">loading more</p>';
+      loadingIndicator.style.display = 'block';
+      grid.innerHTML = '';
+      loadMore();
+    }
+
+    // ----------------------------------------
+    // 4. FILTER & SEARCH
+    // ----------------------------------------
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        currentFilter = this.dataset.filter;
+        resetGallery();
+      });
+    });
+
+    searchInput.addEventListener('input', function() {
+      searchTerm = this.value;
+      resetGallery();
+    });
+
+    // infinite scroll
+    window.addEventListener('scroll', function() {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 400) {
+        loadMore();
+      }
+    });
+
+    // ----------------------------------------
+    // 5. LIGHTBOX
+    // ----------------------------------------
+    function openLightbox(index) {
+      if (!lightboxImages.length) return;
+      lightboxIndex = index;
+      lightboxImg.src = lightboxImages[index].full;
+      lightbox.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightboxFn() {
+      lightbox.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    grid.addEventListener('click', function(e) {
+      const item = e.target.closest('.masonry-item');
+      if (!item) return;
+      const id = parseInt(item.dataset.id);
+      const img = allImages.find(i => i.id === id);
+      if (!img) return;
+      // build lightbox list from current visible
+      lightboxImages = visibleImages.map(i => ({ full: i.src, title: i.title }));
+      const idx = lightboxImages.findIndex(i => i.full === img.src);
+      if (idx !== -1) openLightbox(idx);
+    });
+
+    closeLightbox.addEventListener('click', closeLightboxFn);
+    document.addEventListener('keydown', function(e) {
+      if (!lightbox.classList.contains('open')) return;
+      if (e.key === 'Escape') closeLightboxFn();
+      if (e.key === 'ArrowLeft') { lightboxIndex = (lightboxIndex - 1 + lightboxImages.length) % lightboxImages.length; lightboxImg.src = lightboxImages[lightboxIndex].full; }
+      if (e.key === 'ArrowRight') { lightboxIndex = (lightboxIndex + 1) % lightboxImages.length; lightboxImg.src = lightboxImages[lightboxIndex].full; }
+    });
+    prevBtn.addEventListener('click', function() { lightboxIndex = (lightboxIndex - 1 + lightboxImages.length) % lightboxImages.length; lightboxImg.src = lightboxImages[lightboxIndex].full; });
+    nextBtn.addEventListener('click', function() { lightboxIndex = (lightboxIndex + 1) % lightboxImages.length; lightboxImg.src = lightboxImages[lightboxIndex].full; });
+
+    // Share
+    document.getElementById('shareTwitter').addEventListener('click', function() {
+      const url = encodeURIComponent(window.location.href);
+      window.open(`https://twitter.com/intent/tweet?url=${url}&text=Check%20this%20photo!`, '_blank');
+    });
+    document.getElementById('shareFacebook').addEventListener('click', function() {
+      const url = encodeURIComponent(window.location.href);
+      window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+    });
+    document.getElementById('shareLink').addEventListener('click', function() {
+      navigator.clipboard?.writeText(window.location.href).then(() => alert('Link copied!'));
+    });
+
+    // ----------------------------------------
+    // 6. PROTECTION (right-click, drag, keys)
+    // ----------------------------------------
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('dragstart', e => e.preventDefault());
+    document.addEventListener('copy', e => e.preventDefault());
+    document.addEventListener('keydown', function(e) {
+      if (e.ctrlKey && (e.key === 's' || e.key === 'S' || e.key === 'u' || e.key === 'U' || e.key === 'i' || e.key === 'I')) {
+        e.preventDefault();
+      }
+      if (e.key === 'F12') e.preventDefault();
+    });
+
+    // ----------------------------------------
+    // INIT
+    // ----------------------------------------
+    resetGallery();
+    // if already authenticated, show gallery
+    if (localStorage.getItem('gallery_auth') === 'true') {
+      overlay.classList.add('hidden');
+    }
+
+  })();
+</script>
+<!-- In production, use PHP to read folder and output JSON.
+     This demo uses static images with watermark overlay.
+     For full protection, implement server-side image serving with token. -->
+</body>
+</html>
